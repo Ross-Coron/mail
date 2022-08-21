@@ -6,6 +6,13 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
   document.querySelector('#compose').addEventListener('click', compose_email);
 
+
+  // Test eventlistener
+  document.querySelector('#compose-form .btn').addEventListener('click', () => {
+    alert('Success!');
+  })
+
+
   // By default, load the inbox
   load_mailbox('inbox');
 });
