@@ -7,11 +7,11 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector('#compose').addEventListener('click', compose_email);
 
 
-  // Test eventlistener
+  // Test function
+  let foo = document.querySelector('#compose-recipients')
   document.querySelector('#compose-form .btn').addEventListener('click', () => {
-    alert('Success!');
+    alert(foo.value);
   })
-
 
   // By default, load the inbox
   load_mailbox('inbox');
