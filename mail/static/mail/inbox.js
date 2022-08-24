@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
 
   // By default, load the inbox
-  load_mailbox('inbox');
+//  load_mailbox('inbox');
 
   // Event listeners for each button. Use buttons to toggle between views
   document.querySelector('#inbox').addEventListener('click', () => load_mailbox('inbox'));
@@ -61,7 +61,7 @@ function load_mailbox(mailbox) {
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 
   // Test function - does not work. NavBar buttons no longer work
-  if mailbox == "inbox" {
+  if (mailbox === "inbox") {
     alert("success")
   };
 
