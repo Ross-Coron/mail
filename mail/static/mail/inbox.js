@@ -59,4 +59,11 @@ function load_mailbox(mailbox) {
 
   // Show the mailbox name (passed in as argument)
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+
+  // Test function - does not work. NavBar buttons no longer work
+  if mailbox == "inbox" {
+    alert("success")
+  };
+
+
 }
