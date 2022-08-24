@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
 
+  // By default, load the inbox
+  load_mailbox('inbox');
+
   // Event listeners for each button. Use buttons to toggle between views
   document.querySelector('#inbox').addEventListener('click', () => load_mailbox('inbox'));
   document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
@@ -8,22 +11,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
   // Test function - alert and console log form field
-  document.querySelector('#compose-form .btn').addEventListener('click', () => {
-    // console.log(user)
-    console.log(document.querySelector('#compose-recipients').value);
-    console.log(document.querySelector('#compose-subject').value);
-    console.log(document.querySelector('#compose-body').value);
-    alert("Event listener success!");
+  document.querySelector('#compose-form').onsubmit = function() {
 
-    // POST request to /email passing in vals
-  })
+    // By default, load the inbox
+    load_mailbox('inbox');
 
+    fetch('/emails', {
+        method: 'POST',
+        body: JSON.stringify({
+          recipients: document.querySelector('#compose-recipients').value,
+          subject: document.querySelector('#compose-subject').value,
+          body: document.querySelector('#compose-body').value
+        })
+      })
 
+      .then(response => response.json())
+      .then(result => {
+        // Print result
+        console.log(result);
+      })
 
+    // Prevent form from submitting
+    return false;
 
-  // By default, load the inbox
-  load_mailbox('inbox');
+  };
 });
+
 
 function compose_email() {
 
