@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
 
   // By default, load the inbox
-//  load_mailbox('inbox');
+  load_mailbox('inbox');
 
   // Event listeners for each button. Use buttons to toggle between views
   document.querySelector('#inbox').addEventListener('click', () => load_mailbox('inbox'));
@@ -60,10 +60,30 @@ function load_mailbox(mailbox) {
   // Show the mailbox name (passed in as argument)
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 
-  // Test function - does not work. NavBar buttons no longer work
   if (mailbox === "inbox") {
-    alert("success")
-  };
+    // Debug
+    console.log("Inbox - success")
 
+    // TODO - pass in email id
+    fetch('/emails/1')
+      .then(response => response.json())
+      .then(email => {
+        // Debug
+        console.log(email);
 
-}
+        // For fields in eamil, create an list item and display value
+        for (const field in email) {
+          var list_item = document.createElement("li");
+          list_item.id = "test";
+          list_item.innerHTML = email[field];
+          document.querySelector('#emails-view').appendChild(list_item);
+        }
+      });
+
+    // Test alerts for mailbox specification
+  } else if (mailbox === "sent") {
+    console.log("Sent - success")
+  } else if (mailbox === "archive") {
+    console.log("Archived - success")
+  }
+};
