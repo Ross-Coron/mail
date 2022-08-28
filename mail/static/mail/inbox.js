@@ -56,6 +56,7 @@ function load_mailbox(mailbox) {
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
+  document.querySelector('#email-view').style.display = 'none';
 
   // Show the mailbox name (passed in as argument)
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
@@ -73,15 +74,57 @@ function load_mailbox(mailbox) {
         for (const x in email) {
           var list_item = document.createElement("li");
           list_item.id = "style_test";
-          list_item.innerHTML = (`<a href="#">Email from ${email[x].sender} recieved ${email[x].timestamp}</a>`)
+
+          list_item.innerHTML = `Email from ${email[x].sender} recieved ${email[x].timestamp} <button class="view" data-email="${email[x].id}">View</button>`;
           document.querySelector('#emails-view').appendChild(list_item);
         }
       });
 
-  // Test alerts for mailbox specification
+    // If hide button is clicked, delete the post
+    document.addEventListener('click', event => {
+
+      // Find what was clicked on
+      const element = event.target;
+
+      // Check if the user clicked the view button
+      if (element.className === 'view') {
+        view_email(event.target.dataset.email)
+
+      }
+
+    });
+
+    // Test alerts for mailbox specification
   } else if (mailbox === "sent") {
     console.log("Sent - success")
   } else if (mailbox === "archive") {
     console.log("Archived - success")
   }
 };
+
+
+function view_email(email) {
+
+  // Show the mailbox and hide other views
+  document.querySelector('#emails-view').style.display = 'none';
+  document.querySelector('#compose-view').style.display = 'none';
+  document.querySelector('#email-view').style.display = 'block';
+
+  console.log(event.target.dataset.email)
+  email = event.target.dataset.email
+
+  fetch(`/emails/${email}`)
+    .then(response => response.json())
+    .then(email => {
+      // Debug
+      console.log(email);
+
+      // For fields in eamil, create an list item and display value
+      for (const field in email) {
+        var list_item = document.createElement("li");
+        list_item.id = "test";
+        list_item.innerHTML = email[field];
+        document.querySelector('#email-view').appendChild(list_item);
+      }
+    });
+}
