@@ -64,23 +64,21 @@ function load_mailbox(mailbox) {
     // Debug
     console.log("Inbox - success")
 
-    // TODO - pass in email id
-    fetch('/emails/1')
+    fetch('/emails/inbox')
       .then(response => response.json())
       .then(email => {
         // Debug
         console.log(email);
 
-        // For fields in eamil, create an list item and display value
-        for (const field in email) {
+        for (const x in email) {
           var list_item = document.createElement("li");
-          list_item.id = "test";
-          list_item.innerHTML = email[field];
+          list_item.id = "style_test";
+          list_item.innerHTML = (`<a href="#">Email from ${email[x].sender} recieved ${email[x].timestamp}</a>`)
           document.querySelector('#emails-view').appendChild(list_item);
         }
       });
 
-    // Test alerts for mailbox specification
+  // Test alerts for mailbox specification
   } else if (mailbox === "sent") {
     console.log("Sent - success")
   } else if (mailbox === "archive") {
