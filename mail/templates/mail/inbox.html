@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block body %}
+    <!-- Logged in user's email address -->
     <h2>{{ request.user.email }}</h2>
 
     <!-- NavBar-like navigation options. Shows / hides divs below -->
@@ -12,15 +13,15 @@
     <a class="btn btn-sm btn-outline-primary" href="{% url 'logout' %}">Log Out</a>
     <hr>
 
-    <!-- First div element - shows contents of email inbox -->
+    <!-- Div element 1 - shows contents of email inbox -->
     <div id="emails-view">
     </div>
 
+    <!-- Div element 2 - shows contents of an email -->
     <div id="email-view">
     </div>
 
-      </div>
-    <!-- Second div element - shows compose email form -->
+    <!-- Div element 3 - shows compose email form -->
     <div id="compose-view">
         <h3>New Email</h3>
         <form id="compose-form">
