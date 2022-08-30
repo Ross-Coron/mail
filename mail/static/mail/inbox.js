@@ -148,29 +148,6 @@ function view_email(email) {
 
         list_item.innerHTML = `${field}: ${email[field]}`;
         document.querySelector('#email-view').appendChild(list_item);
-
-
-        // Check if archived
-        if (email.archived === true){
-          console.log("True");
-        }
-
-        else {
-          console.log("False")
-        }
-
-
-
       }
     })
-}
-
-// Archive email
-function archive(email) {
-  fetch(`/emails/${email}`, {
-    method: 'PUT',
-    body: JSON.stringify({
-      archived: true
-    })
-})
 }
