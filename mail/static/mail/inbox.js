@@ -21,7 +21,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (element.className === 'view') {
       view_email(email);
 
-    } if (element.className === 'archive') {
+    }
+    if (element.className === 'archive') {
       alert("Archive clicked");
       alert(`Email clicked: ${email}`);
       archive_email(email);
@@ -102,18 +103,16 @@ function load_mailbox(mailbox) {
           // If email has been read (default is unread), render in grey
           if (emails[email].read === true) {
             list_item.style.backgroundColor = "gray";
-          }
-
-          else {
+          } else {
             list_item.style.backgroundColor = "white";
           }
 
           if (emails[email].archived === false) {
             list_item.innerHTML += `<button class="archive" data-email="${emails[email].id}">Archive</button>`
           }
-      //    if (emails[email].archived === true) {
-      //      list_item.innerHTML += `<button class="archive" data-email="${emails[email].id}">Unarchive</button>`
-      //    }
+          //    if (emails[email].archived === true) {
+          //      list_item.innerHTML += `<button class="archive" data-email="${emails[email].id}">Unarchive</button>`
+          //    }
 
 
           // Add populated list item to page
@@ -142,15 +141,11 @@ function load_mailbox(mailbox) {
           list_item.id = "style_test";
 
           list_item.innerHTML = `Email from ${emails[email].sender} recieved ${emails[email].timestamp} <button class="view" data-email="${emails[email].id}">View</button>`;
-document.querySelector('#emails-view').appendChild(list_item);
-
-
-}
+          list_item.innerHTML += `<button class="archive" data-email="${emails[email].id}">Archive</button>`;
+          document.querySelector('#emails-view').appendChild(list_item);
+        }
       })
-    }
-
-  //  console.log("Archived - success")
-
+  }
 };
 
 
@@ -190,13 +185,40 @@ function view_email(email) {
 }
 
 
-function archive_email(email) {
+async function archive_email(email) {
 
-  fetch(`/emails/${email}`, {
-    method: 'PUT',
-    body: JSON.stringify({
-      archived: true
-    })
-  })
-  load_mailbox('inbox');
-}
+
+
+    let res = await fetch(`/emails/${email}`)
+    data = await res.json()
+
+    if (data.archived === true) {
+      fetch(`/emails/${email}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          archived: false
+        })
+      })
+    }
+
+    else{
+      fetch(`/emails/${email}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          archived: true
+        })
+      })
+
+    }
+
+    load_mailbox('archive');
+
+  }
+
+
+
+
+
+
+    //  load_mailbox('inbox');
+    //}
