@@ -1,8 +1,5 @@
-// TODO: styling, comment, archive email option
-
 document.addEventListener('DOMContentLoaded', function() {
 
-  // By default, load the inbox TODO: duplicate?
   load_mailbox('inbox');
 
   // Event listeners for each NavBar button. Use buttons to toggle between views
@@ -15,29 +12,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Find what was clicked on
     let element = event.target;
+    // Get email id
     let email = event.target.dataset.email
 
-    // Check if the user clicked the view button
+    // Check if the user clicked view button and view that email
     if (element.className === 'view') {
       view_email(email);
-
     }
+
+    // Check if the user clicked archive button, archive, return to inbox
     if (element.className === 'archive') {
-      alert("Archive clicked");
-      alert(`Email clicked: ${email}`);
       archive_email(email);
       load_mailbox('inbox');
     }
   });
 
-
   // When compose email form submitted
   document.querySelector('#compose-form').onsubmit = function() {
 
-    // By default, load the inbox TODO: duplicate?
+    // Load inbox
     load_mailbox('inbox');
 
-    // Send email via POST request to /emails.
+    // Send email via a POST request to API (/emails route)
     fetch('/emails', {
         method: 'POST',
         body: JSON.stringify({
@@ -47,10 +43,9 @@ document.addEventListener('DOMContentLoaded', function() {
         })
       })
 
-      // ???
+      // Console log debug
       .then(response => response.json())
       .then(result => {
-        // Debug
         console.log(result);
       })
 
@@ -59,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 });
 
-
+// Function: displays compose email form and clears contents
 function compose_email() {
 
   // Show ('block') compose view and hide ('none') other views
@@ -72,7 +67,7 @@ function compose_email() {
   document.querySelector('#compose-body').value = '';
 }
 
-// Called by clicking NavBar button. Three valid arguments: inbox, sent, and archive
+// Function to view mailboxes. Called by clicking NavBar button. Three valid arguments: inbox, sent, and archive
 function load_mailbox(mailbox) {
 
   // Show mailbox and hide other views
@@ -80,21 +75,21 @@ function load_mailbox(mailbox) {
   document.querySelector('#compose-view').style.display = 'none';
   document.querySelector('#email-view').style.display = 'none';
 
-  // Show the mailbox name (passed in as argument)
+  // Show capitalise mailbox name (passed in as argument)
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 
   if (mailbox === "inbox") {
     // Debug
-    console.log("Inbox - success")
+    console.log("Viewing inbox...")
 
     // GET request to emails/inbox, converts to JSON, provide array of emails as variable emails
     fetch('/emails/inbox')
       .then(response => response.json())
       .then(emails => {
-        // DEBUG
+        // Debug - displays all emails as array
         console.log(emails);
 
-        // For each email, create a list item with styling
+        // For each email, create a list item with styling (style.css)
         for (let email in emails) {
           var list_item = document.createElement("li");
           list_item.id = "style_test";
@@ -108,14 +103,10 @@ function load_mailbox(mailbox) {
             list_item.style.backgroundColor = "white";
           }
 
+          // If email is not archived, render archive button
           if (emails[email].archived === false) {
             list_item.innerHTML += `<button class="archive" data-email="${emails[email].id}">Archive</button>`
           }
-
-          // Redundant
-          //    if (emails[email].archived === true) {
-          //      list_item.innerHTML += `<button class="archive" data-email="${emails[email].id}">Unarchive</button>`
-          //    }
 
           // Add populated list item to page
           document.querySelector('#emails-view').appendChild(list_item);
@@ -123,7 +114,7 @@ function load_mailbox(mailbox) {
       });
 
 
-  // TODO
+  // Sent view - IN PROGRESS
   } else if (mailbox === "sent") {
 
     fetch('/emails/sent')
@@ -138,12 +129,13 @@ function load_mailbox(mailbox) {
 
           list_item.innerHTML = `Email from ${emails[email].sender} recieved ${emails[email].timestamp} <button class="view" data-email="${emails[email].id}">View</button>`;
           document.querySelector('#emails-view').appendChild(list_item);
-}
+        }
 
-    console.log("Sent - success") // DEBUG
+        console.log("Sent - success") // DEBUG
 
-  })
+      })
 
+  // Archive view
   } else if (mailbox === "archive") {
 
     fetch('/emails/archive')
@@ -165,7 +157,7 @@ function load_mailbox(mailbox) {
 };
 
 
-// View single email and mark as read
+// Function: view single email and mark as read
 function view_email(email) {
 
   // Show the mailbox and hide other views
@@ -189,7 +181,6 @@ function view_email(email) {
       // Debug
       console.log(email);
 
-    
       // For fields in eamil, create an list item and display value
       document.getElementById("email-view").innerHTML = '';
 
@@ -203,7 +194,7 @@ function view_email(email) {
 }
 
 
-// Archive /unarchive email
+// Function: archive /unarchive email
 async function archive_email(email) {
 
   let res = await fetch(`/emails/${email}`)
