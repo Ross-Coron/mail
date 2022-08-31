@@ -11,6 +11,24 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
   document.querySelector('#compose').addEventListener('click', compose_email);
 
+  document.addEventListener('click', event => {
+
+    // Find what was clicked on
+    let element = event.target;
+    let email = event.target.dataset.email
+
+    // Check if the user clicked the view button
+    if (element.className === 'view') {
+      view_email(email);
+
+    } if (element.className === 'archive') {
+      alert("Archive clicked");
+      alert(`Email clicked: ${email}`);
+      archive_email(email);
+    }
+  });
+
+
   // When compose email form submitted
   document.querySelector('#compose-form').onsubmit = function() {
 
@@ -75,7 +93,7 @@ function load_mailbox(mailbox) {
         console.log(emails);
 
         // For each email, create a list item with styling
-        for (const email in emails) {
+        for (let email in emails) {
           var list_item = document.createElement("li");
           list_item.id = "style_test";
 
@@ -83,37 +101,56 @@ function load_mailbox(mailbox) {
 
           // If email has been read (default is unread), render in grey
           if (emails[email].read === true) {
-            console.log("Read");
             list_item.style.backgroundColor = "gray";
+          }
 
-          } else {
-            console.log("Not read")
+          else {
             list_item.style.backgroundColor = "white";
           }
+
+          if (emails[email].archived === false) {
+            list_item.innerHTML += `<button class="archive" data-email="${emails[email].id}">Archive</button>`
+          }
+      //    if (emails[email].archived === true) {
+      //      list_item.innerHTML += `<button class="archive" data-email="${emails[email].id}">Unarchive</button>`
+      //    }
+
 
           // Add populated list item to page
           document.querySelector('#emails-view').appendChild(list_item);
         }
       });
 
+
+
     // ???
-    document.addEventListener('click', event => {
 
-      // Find what was clicked on
-      const element = event.target;
-
-      // Check if the user clicked the view button
-      if (element.className === 'view') {
-        view_email(event.target.dataset.email)
-      }
-    });
 
     // Test alerts for mailbox specification
   } else if (mailbox === "sent") {
     console.log("Sent - success")
   } else if (mailbox === "archive") {
-    console.log("Archived - success")
-  }
+
+    fetch('/emails/archive')
+      .then(response => response.json())
+      .then(emails => {
+        // Debug
+        console.log(emails);
+
+        for (let email in emails) {
+          var list_item = document.createElement("li");
+          list_item.id = "style_test";
+
+          list_item.innerHTML = `Email from ${emails[email].sender} recieved ${emails[email].timestamp} <button class="view" data-email="${emails[email].id}">View</button>`;
+document.querySelector('#emails-view').appendChild(list_item);
+
+
+}
+      })
+    }
+
+  //  console.log("Archived - success")
+
 };
 
 
@@ -143,11 +180,23 @@ function view_email(email) {
       // For fields in eamil, create an list item and display value
       document.getElementById("email-view").innerHTML = '';
 
-      for (const field in email) {
+      for (let field in email) {
         var list_item = document.createElement("li");
 
         list_item.innerHTML = `${field}: ${email[field]}`;
         document.querySelector('#email-view').appendChild(list_item);
       }
     })
+}
+
+
+function archive_email(email) {
+
+  fetch(`/emails/${email}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      archived: true
+    })
+  })
+  load_mailbox('inbox');
 }
