@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
       alert("Archive clicked");
       alert(`Email clicked: ${email}`);
       archive_email(email);
+      load_mailbox('inbox');
     }
   });
 
@@ -90,7 +91,7 @@ function load_mailbox(mailbox) {
     fetch('/emails/inbox')
       .then(response => response.json())
       .then(emails => {
-        // Debug
+        // DEBUG
         console.log(emails);
 
         // For each email, create a list item with styling
@@ -110,10 +111,11 @@ function load_mailbox(mailbox) {
           if (emails[email].archived === false) {
             list_item.innerHTML += `<button class="archive" data-email="${emails[email].id}">Archive</button>`
           }
+
+          // Redundant
           //    if (emails[email].archived === true) {
           //      list_item.innerHTML += `<button class="archive" data-email="${emails[email].id}">Unarchive</button>`
           //    }
-
 
           // Add populated list item to page
           document.querySelector('#emails-view').appendChild(list_item);
@@ -121,13 +123,27 @@ function load_mailbox(mailbox) {
       });
 
 
-
-    // ???
-
-
-    // Test alerts for mailbox specification
+  // TODO
   } else if (mailbox === "sent") {
-    console.log("Sent - success")
+
+    fetch('/emails/sent')
+      .then(response => response.json())
+      .then(emails => {
+        // Debug
+        console.log(emails);
+
+        for (let email in emails) {
+          var list_item = document.createElement("li");
+          list_item.id = "style_test";
+
+          list_item.innerHTML = `Email from ${emails[email].sender} recieved ${emails[email].timestamp} <button class="view" data-email="${emails[email].id}">View</button>`;
+          document.querySelector('#emails-view').appendChild(list_item);
+}
+
+    console.log("Sent - success") // DEBUG
+
+  })
+
   } else if (mailbox === "archive") {
 
     fetch('/emails/archive')
@@ -141,7 +157,7 @@ function load_mailbox(mailbox) {
           list_item.id = "style_test";
 
           list_item.innerHTML = `Email from ${emails[email].sender} recieved ${emails[email].timestamp} <button class="view" data-email="${emails[email].id}">View</button>`;
-          list_item.innerHTML += `<button class="archive" data-email="${emails[email].id}">Archive</button>`;
+          list_item.innerHTML += `<button class="archive" data-email="${emails[email].id}">Unarchive</button>`;
           document.querySelector('#emails-view').appendChild(list_item);
         }
       })
@@ -149,6 +165,7 @@ function load_mailbox(mailbox) {
 };
 
 
+// View single email and mark as read
 function view_email(email) {
 
   // Show the mailbox and hide other views
@@ -157,7 +174,7 @@ function view_email(email) {
   document.querySelector('#email-view').style.display = 'block';
 
   console.log(event.target.dataset.email)
-  email = event.target.dataset.email
+  //  email = event.target.dataset.email
 
   fetch(`/emails/${email}`, {
     method: 'PUT',
@@ -172,6 +189,7 @@ function view_email(email) {
       // Debug
       console.log(email);
 
+    
       // For fields in eamil, create an list item and display value
       document.getElementById("email-view").innerHTML = '';
 
@@ -185,40 +203,27 @@ function view_email(email) {
 }
 
 
+// Archive /unarchive email
 async function archive_email(email) {
 
+  let res = await fetch(`/emails/${email}`)
+  data = await res.json()
 
-
-    let res = await fetch(`/emails/${email}`)
-    data = await res.json()
-
-    if (data.archived === true) {
-      fetch(`/emails/${email}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          archived: false
-        })
+  if (data.archived === true) {
+    fetch(`/emails/${email}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        archived: false
       })
-    }
+    })
+    alert("DEBUG: Unarchived")
 
-    else{
-      fetch(`/emails/${email}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          archived: true
-        })
+  } else {
+    fetch(`/emails/${email}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        archived: true
       })
-
-    }
-
-    load_mailbox('archive');
-
+    })
   }
-
-
-
-
-
-
-    //  load_mailbox('inbox');
-    //}
+}
