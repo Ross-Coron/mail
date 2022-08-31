@@ -12,8 +12,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Find what was clicked on
     let element = event.target;
+
     // Get email id
-    let email = event.target.dataset.email
+    let email = event.target.dataset.email;
 
     // Check if the user clicked view button and view that email
     if (element.className === 'view') {
@@ -47,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
       .then(response => response.json())
       .then(result => {
         console.log(result);
-      })
+      });
 
     // Prevents form from submitting
     return false;
@@ -78,9 +79,9 @@ function load_mailbox(mailbox) {
   // Show capitalise mailbox name (passed in as argument)
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 
-  if (mailbox === "inbox") {
+  if (mailbox === 'inbox') {
     // Debug
-    console.log("Viewing inbox...")
+    console.log('Viewing inbox...');
 
     // GET request to emails/inbox, converts to JSON, provide array of emails as variable emails
     fetch('/emails/inbox')
@@ -115,7 +116,7 @@ function load_mailbox(mailbox) {
 
 
   // Sent view - IN PROGRESS
-  } else if (mailbox === "sent") {
+  } else if (mailbox === 'sent') {
 
     fetch('/emails/sent')
       .then(response => response.json())
@@ -124,19 +125,20 @@ function load_mailbox(mailbox) {
         console.log(emails);
 
         for (let email in emails) {
-          var list_item = document.createElement("li");
-          list_item.id = "style_test";
+          var list_item = document.createElement('li');
+          list_item.id = 'style_test';
 
           list_item.innerHTML = `Email from ${emails[email].sender} recieved ${emails[email].timestamp} <button class="view" data-email="${emails[email].id}">View</button>`;
           document.querySelector('#emails-view').appendChild(list_item);
         }
 
-        console.log("Sent - success") // DEBUG
+        // DEBUG
+        console.log('Sent - success');
 
-      })
+      });
 
   // Archive view
-  } else if (mailbox === "archive") {
+  } else if (mailbox === 'archive') {
 
     fetch('/emails/archive')
       .then(response => response.json())
@@ -145,7 +147,7 @@ function load_mailbox(mailbox) {
         console.log(emails);
 
         for (let email in emails) {
-          var list_item = document.createElement("li");
+          var list_item = document.createElement('li');
           list_item.id = "style_test";
 
           list_item.innerHTML = `Email from ${emails[email].sender} recieved ${emails[email].timestamp} <button class="view" data-email="${emails[email].id}">View</button>`;
@@ -165,7 +167,7 @@ function view_email(email) {
   document.querySelector('#compose-view').style.display = 'none';
   document.querySelector('#email-view').style.display = 'block';
 
-  console.log(event.target.dataset.email)
+  console.log(event.target.dataset.email);
   //  email = event.target.dataset.email
 
   fetch(`/emails/${email}`, {
@@ -190,6 +192,15 @@ function view_email(email) {
         list_item.innerHTML = `${field}: ${email[field]}`;
         document.querySelector('#email-view').appendChild(list_item);
       }
+
+      // Add button to page
+      var x = document.createElement('button')
+      x.innerHTML = ("Click Me!")
+      document.querySelector('#email-view').appendChild(x);
+
+
+
+
     })
 }
 
