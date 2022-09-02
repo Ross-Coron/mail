@@ -1,41 +1,42 @@
 document.addEventListener('DOMContentLoaded', function() {
 
+  // Load mailbox by default
   load_mailbox('inbox');
 
-  // Event listeners for each NavBar button. Use buttons to toggle between views
+  // Event listeners for each NavBar button. Use buttons to toggle between views.
   document.querySelector('#inbox').addEventListener('click', () => load_mailbox('inbox'));
   document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
   document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
   document.querySelector('#compose').addEventListener('click', () => compose_email("New Email"));
 
+  // Email handling
   document.addEventListener('click', event => {
 
-    // Find what was clicked on
-    let element = event.target;
+    // Get email's unique id
+    const email = event.target.dataset.email;
 
-    // Get email id
-    let email = event.target.dataset.email;
+    // Find what was clicked on
+    // const element = event.target;
 
     // Check if the user clicked view button and view that email
-    if (element.className === 'view') {
+    if (event.target.className === 'view') {
       view_email(email);
     }
 
-    if (element.className === 'compose') {
-      compose_email();
-    }
+    //  if (event.target.className === 'compose') {
+    //    compose_email();
+    //  }
 
-    // Check if the user clicked archive button, archive, return to inbox
-    if (element.className === 'archive') {
+    // Check if the user clicked email archive button, archive, return to inbox view
+    else if (event.target.className === 'archive') {
       archive_email(email);
-      load_mailbox('inbox');
     }
   });
 
   // When compose email form submitted
   document.querySelector('#compose-form').onsubmit = function() {
 
-    // Load inbox
+    // Load inbox view
     load_mailbox('inbox');
 
     // Send email via a POST request to API (/emails route)
@@ -54,18 +55,18 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(result);
       });
 
-    // Prevents form from submitting
+    // Prevents form from submitting (default behaviour)
     return false;
   };
 });
 
-// Function: displays compose email form and clears contents
-function compose_email(state, email) {
 
-  console.log(email)
+// Function: displays compose email view (titled 'New Email' or 'Reply') and clears form contents
+function compose_email(state, email) {
 
   if (state === "New Email") {
 
+    // Set page title to 'New Email'
     document.querySelector('#NewOrReply').innerHTML = state
 
     // Show ('block') compose view and hide ('none') other views
@@ -76,17 +77,17 @@ function compose_email(state, email) {
     document.querySelector('#compose-recipients').value = '';
     document.querySelector('#compose-subject').value = '';
     document.querySelector('#compose-body').value = '';
-  }
 
-else if (state === "Reply") {
+  } else if (state === "Reply") {
 
+    // Set page title to 'New Email'
     document.querySelector('#NewOrReply').innerHTML = state
 
     // Show ('block') compose view and hide ('none') other views
     document.querySelector('#emails-view').style.display = 'none';
     document.querySelector('#compose-view').style.display = 'block';
 
-    // Clear out any previous values from form fields
+    // Auto fills form with reply elements (Re, sender, etc.)
     document.querySelector('#compose-recipients').value = `${email.sender}`;
     document.querySelector('#compose-subject').value = `Re: ${email.subject}`;
     document.querySelector('#compose-body').value = `On ${email.timestamp} ${email.sender} wrote: ${email.body} \r\n\r\n --- \r\n\r\n`;
@@ -94,7 +95,7 @@ else if (state === "Reply") {
 }
 
 
-// Function to view mailboxes. Called by clicking NavBar button. Three valid arguments: inbox, sent, and archive
+// Function: view mailboxes. Called by clicking NavBar button. Three valid mailboxes / arguments: inbox, sent, and archive
 function load_mailbox(mailbox) {
 
   // Show mailbox and hide other views
@@ -102,83 +103,79 @@ function load_mailbox(mailbox) {
   document.querySelector('#compose-view').style.display = 'none';
   document.querySelector('#email-view').style.display = 'none';
 
-  // Show capitalise mailbox name (passed in as argument)
+  // Show capitalised mailbox name (passed in as argument)
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 
+  // Inbox view
   if (mailbox === 'inbox') {
-    // Debug
-    console.log('Viewing inbox...');
 
-    // GET request to emails/inbox, converts to JSON, provide array of emails as variable emails
+    console.log('Debug: viewing inbox.');
+
+    // GET request to API route 'emails/inbox', converts to JSON, provide array of emails as variable emails
     fetch('/emails/inbox')
       .then(response => response.json())
       .then(emails => {
-        // Debug - displays all emails as array
+        // DEBUG - logs all emails as array to console
         console.log(emails);
 
-        // For each email, create a list item with styling (style.css)
+        // For each email, create a list item with styling (style.css), and add
         for (let email in emails) {
-          var list_item = document.createElement("li");
-          list_item.id = "style_test";
+          const item = document.createElement("div");
+          item.id = "style_test";
+          item.innerHTML = `Email from ${emails[email].sender} recieved ${emails[email].timestamp} <button class="view" data-email="${emails[email].id}">View</button>`;
 
-          list_item.innerHTML = `Email from ${emails[email].sender} recieved ${emails[email].timestamp} <button class="view" data-email="${emails[email].id}">View</button>`;
-
-          // If email has been read (default is unread), render in grey
+          // If email has been read, display as grey otherwise white
           if (emails[email].read === true) {
-            list_item.style.backgroundColor = "gray";
+            item.style.backgroundColor = "gray";
           } else {
-            list_item.style.backgroundColor = "white";
+            item.style.backgroundColor = "white";
           }
 
-          // If email is not archived, render archive button
+          // If email has NOT been archived, attach archive button
           if (emails[email].archived === false) {
-            list_item.innerHTML += `<button class="archive" data-email="${emails[email].id}">Archive</button>`
+            item.innerHTML += `<button class="archive" data-email="${emails[email].id}">Archive</button>`
           }
 
-          // Add populated list item to page
-          document.querySelector('#emails-view').appendChild(list_item);
+          // Add populated item to page
+          document.querySelector('#emails-view').appendChild(item);
         }
       });
 
-
-    // Sent view - IN PROGRESS
+  // Sent view
   } else if (mailbox === 'sent') {
+
+    console.log('Debug: viewing sent emails');
 
     fetch('/emails/sent')
       .then(response => response.json())
       .then(emails => {
-        // Debug
         console.log(emails);
 
         for (let email in emails) {
-          var list_item = document.createElement('li');
-          list_item.id = 'style_test';
+          const item = document.createElement('div');
+          item.id = 'style_test';
 
-          list_item.innerHTML = `Email from ${emails[email].sender} recieved ${emails[email].timestamp} <button class="view" data-email="${emails[email].id}">View</button>`;
-          document.querySelector('#emails-view').appendChild(list_item);
+          item.innerHTML = `Email from ${emails[email].sender} recieved ${emails[email].timestamp} <button class="view" data-email="${emails[email].id}">View</button>`;
+          document.querySelector('#emails-view').appendChild(item);
         }
-
-        // DEBUG
-        console.log('Sent - success');
-
       });
 
-    // Archive view
+  // Archive view
   } else if (mailbox === 'archive') {
 
     fetch('/emails/archive')
       .then(response => response.json())
       .then(emails => {
-        // Debug
+
         console.log(emails);
 
         for (let email in emails) {
-          var list_item = document.createElement('li');
-          list_item.id = "style_test";
+          const item = document.createElement('div');
+          item.id = "style_test";
 
-          list_item.innerHTML = `Email from ${emails[email].sender} recieved ${emails[email].timestamp} <button class="view" data-email="${emails[email].id}">View</button>`;
-          list_item.innerHTML += `<button class="archive" data-email="${emails[email].id}">Unarchive</button>`;
-          document.querySelector('#emails-view').appendChild(list_item);
+          item.innerHTML = `Email from ${emails[email].sender} recieved ${emails[email].timestamp} <button class="view" data-email="${emails[email].id}">View</button>`;
+          item.innerHTML += `<button class="archive" data-email="${emails[email].id}">Unarchive</button>`;
+          document.querySelector('#emails-view').appendChild(item);
         }
       })
   }
@@ -193,9 +190,10 @@ function view_email(email) {
   document.querySelector('#compose-view').style.display = 'none';
   document.querySelector('#email-view').style.display = 'block';
 
-  console.log(event.target.dataset.email);
+  //console.log(event.target.dataset.email);
   //  email = event.target.dataset.email
 
+  // Mark email as read
   fetch(`/emails/${email}`, {
     method: 'PUT',
     body: JSON.stringify({
@@ -203,29 +201,30 @@ function view_email(email) {
     })
   });
 
+  // View email contents
   fetch(`/emails/${email}`)
     .then(response => response.json())
     .then(email => {
-      // Debug
+
       console.log(email);
 
-      // For fields in eamil, create an list item and display value
+      // Clear previous contents (if any)
       document.getElementById("email-view").innerHTML = '';
 
+      // Display email fields as bullet points
       for (let field in email) {
-        var list_item = document.createElement("li");
+        const email_field = document.createElement("li");
 
-        list_item.innerHTML = `${field}: ${email[field]}`;
-        document.querySelector('#email-view').appendChild(list_item);
+        email_field.innerHTML = `${field}: ${email[field]}`;
+        document.querySelector('#email-view').appendChild(email_field);
       }
 
-      // Add button to page
-      var reply = document.createElement('button')
-      reply.innerHTML = ("Click Me!")
+      // Add reply button
+      const reply = document.createElement('button')
+      reply.innerHTML = ("Reply")
       document.querySelector('#email-view').appendChild(reply);
 
       reply.onclick = function() {
-        // TODO: remove original email
         document.querySelector('#email-view').style.display = 'none';
         compose_email("Reply", email);
       }
@@ -233,11 +232,11 @@ function view_email(email) {
 }
 
 
-// Function: archive /unarchive email
+// Function: archive / unarchive email
 async function archive_email(email) {
 
-  let res = await fetch(`/emails/${email}`)
-  data = await res.json()
+  const result = await fetch(`/emails/${email}`)
+  data = await result.json()
 
   if (data.archived === true) {
     fetch(`/emails/${email}`, {
@@ -246,7 +245,9 @@ async function archive_email(email) {
         archived: false
       })
     })
-    alert("DEBUG: Unarchived")
+    console.log("Email archived")
+    location.reload()
+    load_mailbox('inbox')
 
   } else {
     fetch(`/emails/${email}`, {
@@ -255,5 +256,8 @@ async function archive_email(email) {
         archived: true
       })
     })
+    console.log("Email unarchived")
+    location.reload()
+    load_mailbox('inbox')
   }
 }
