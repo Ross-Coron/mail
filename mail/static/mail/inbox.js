@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector('#inbox').addEventListener('click', () => load_mailbox('inbox'));
   document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
   document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
-  document.querySelector('#compose').addEventListener('click', compose_email);
+  document.querySelector('#compose').addEventListener('click', () => compose_email("New Email"));
 
   document.addEventListener('click', event => {
 
@@ -19,6 +19,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check if the user clicked view button and view that email
     if (element.className === 'view') {
       view_email(email);
+    }
+
+    if (element.className === 'compose') {
+      compose_email();
     }
 
     // Check if the user clicked archive button, archive, return to inbox
@@ -56,17 +60,39 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Function: displays compose email form and clears contents
-function compose_email() {
+function compose_email(state, email) {
 
-  // Show ('block') compose view and hide ('none') other views
-  document.querySelector('#emails-view').style.display = 'none';
-  document.querySelector('#compose-view').style.display = 'block';
+  console.log(email)
 
-  // Clear out any previous values from form fields
-  document.querySelector('#compose-recipients').value = '';
-  document.querySelector('#compose-subject').value = '';
-  document.querySelector('#compose-body').value = '';
+  if (state === "New Email") {
+
+    document.querySelector('#NewOrReply').innerHTML = state
+
+    // Show ('block') compose view and hide ('none') other views
+    document.querySelector('#emails-view').style.display = 'none';
+    document.querySelector('#compose-view').style.display = 'block';
+
+    // Clear out any previous values from form fields
+    document.querySelector('#compose-recipients').value = '';
+    document.querySelector('#compose-subject').value = '';
+    document.querySelector('#compose-body').value = '';
+  }
+
+else if (state === "Reply") {
+
+    document.querySelector('#NewOrReply').innerHTML = state
+
+    // Show ('block') compose view and hide ('none') other views
+    document.querySelector('#emails-view').style.display = 'none';
+    document.querySelector('#compose-view').style.display = 'block';
+
+    // Clear out any previous values from form fields
+    document.querySelector('#compose-recipients').value = `${email.sender}`;
+    document.querySelector('#compose-subject').value = `Re: ${email.subject}`;
+    document.querySelector('#compose-body').value = `On ${email.timestamp} ${email.sender} wrote: ${email.body} \r\n\r\n --- \r\n\r\n`;
+  }
 }
+
 
 // Function to view mailboxes. Called by clicking NavBar button. Three valid arguments: inbox, sent, and archive
 function load_mailbox(mailbox) {
@@ -115,7 +141,7 @@ function load_mailbox(mailbox) {
       });
 
 
-  // Sent view - IN PROGRESS
+    // Sent view - IN PROGRESS
   } else if (mailbox === 'sent') {
 
     fetch('/emails/sent')
@@ -137,7 +163,7 @@ function load_mailbox(mailbox) {
 
       });
 
-  // Archive view
+    // Archive view
   } else if (mailbox === 'archive') {
 
     fetch('/emails/archive')
@@ -194,13 +220,15 @@ function view_email(email) {
       }
 
       // Add button to page
-      var x = document.createElement('button')
-      x.innerHTML = ("Click Me!")
-      document.querySelector('#email-view').appendChild(x);
+      var reply = document.createElement('button')
+      reply.innerHTML = ("Click Me!")
+      document.querySelector('#email-view').appendChild(reply);
 
-
-
-
+      reply.onclick = function() {
+        // TODO: remove original email
+        document.querySelector('#email-view').style.display = 'none';
+        compose_email("Reply", email);
+      }
     })
 }
 

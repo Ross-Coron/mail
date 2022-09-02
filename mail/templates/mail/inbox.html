@@ -21,11 +21,9 @@
     <div id="email-view">
     </div>
 
-
-
     <!-- Div element 3 - shows compose email form -->
     <div id="compose-view">
-        <h3>New Email</h3>
+        <h3 id="NewOrReply"></h3>
         <form id="compose-form">
             <div class="form-group">
                 From: <input disabled class="form-control" value="{{ request.user.email }}">
