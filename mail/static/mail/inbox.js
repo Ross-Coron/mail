@@ -94,7 +94,6 @@ function compose_email(state, email) {
   }
 }
 
-
 // Function: view mailboxes. Called by clicking NavBar button. Three valid mailboxes / arguments: inbox, sent, and archive
 function load_mailbox(mailbox) {
 
@@ -181,7 +180,6 @@ function load_mailbox(mailbox) {
   }
 };
 
-
 // Function: view single email and mark as read
 function view_email(email) {
 
@@ -231,8 +229,7 @@ function view_email(email) {
     })
 }
 
-
-// Function: archive / unarchive email
+// Function: archive and unarchive email
 async function archive_email(email) {
 
   const result = await fetch(`/emails/${email}`)
@@ -246,8 +243,6 @@ async function archive_email(email) {
       })
     })
     console.log("Email archived")
-    location.reload()
-    load_mailbox('inbox')
 
   } else {
     fetch(`/emails/${email}`, {
@@ -257,7 +252,7 @@ async function archive_email(email) {
       })
     })
     console.log("Email unarchived")
-    location.reload()
-    load_mailbox('inbox')
   }
+
+  location.reload(load_mailbox('inbox'))
 }
