@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-  // Load mailbox by default
+  // Load inbox by default
   load_mailbox('inbox');
 
   // Event listeners for each NavBar button. Use buttons to toggle between views.
@@ -15,20 +15,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get email's unique id
     const email = event.target.dataset.email;
 
-    // Find what was clicked on
-    // const element = event.target;
-
-    // Check if the user clicked view button and view that email
+    // Check if the user clicked view button or archive button
     if (event.target.className === 'view') {
       view_email(email);
-    }
-
-    //  if (event.target.className === 'compose') {
-    //    compose_email();
-    //  }
-
-    // Check if the user clicked email archive button, archive, return to inbox view
-    else if (event.target.className === 'archive') {
+    } else if (event.target.className === 'archive') {
       archive_email(email);
     }
   });
@@ -59,7 +49,6 @@ document.addEventListener('DOMContentLoaded', function() {
     return false;
   };
 });
-
 
 // Function: displays compose email view (titled 'New Email' or 'Reply') and clears form contents
 function compose_email(state, email) {
@@ -121,18 +110,21 @@ function load_mailbox(mailbox) {
         for (let email in emails) {
           const item = document.createElement("div");
           item.id = "style_test";
-          item.innerHTML = `Email from ${emails[email].sender} recieved ${emails[email].timestamp} <button class="view" data-email="${emails[email].id}">View</button>`;
+          item.innerHTML = `Email from <b>${emails[email].sender}</b> recieved <b>${emails[email].timestamp}</b> <button class="btn btn-sm btn-primary view" data-email="${emails[email].id}">View</button>`;
 
           // If email has been read, display as grey otherwise white
           if (emails[email].read === true) {
-            item.style.backgroundColor = "gray";
+            item.style.backgroundColor = "lightgray";
           } else {
             item.style.backgroundColor = "white";
           }
 
           // If email has NOT been archived, attach archive button
           if (emails[email].archived === false) {
-            item.innerHTML += `<button class="archive" data-email="${emails[email].id}">Archive</button>`
+            item.innerHTML += `<button class="btn btn-sm btn-secondary archive" data-email="${emails[email].id}">Archive</button>`
+
+            // TODO
+            item.setAttribute("align", "center");
           }
 
           // Add populated item to page
@@ -140,7 +132,7 @@ function load_mailbox(mailbox) {
         }
       });
 
-  // Sent view
+    // Sent view
   } else if (mailbox === 'sent') {
 
     console.log('Debug: viewing sent emails');
@@ -159,7 +151,7 @@ function load_mailbox(mailbox) {
         }
       });
 
-  // Archive view
+    // Archive view
   } else if (mailbox === 'archive') {
 
     fetch('/emails/archive')
@@ -188,8 +180,8 @@ function view_email(email) {
   document.querySelector('#compose-view').style.display = 'none';
   document.querySelector('#email-view').style.display = 'block';
 
-  //console.log(event.target.dataset.email);
-  //  email = event.target.dataset.email
+  // Clear previous contents (if any)
+  document.getElementById("email-view").innerHTML = '';
 
   // Mark email as read
   fetch(`/emails/${email}`, {
@@ -197,7 +189,7 @@ function view_email(email) {
     body: JSON.stringify({
       read: true
     })
-  });
+  })
 
   // View email contents
   fetch(`/emails/${email}`)
@@ -206,10 +198,8 @@ function view_email(email) {
 
       console.log(email);
 
-      // Clear previous contents (if any)
-      document.getElementById("email-view").innerHTML = '';
-
       // Display email fields as bullet points
+
       for (let field in email) {
         const email_field = document.createElement("li");
 
@@ -222,6 +212,7 @@ function view_email(email) {
       reply.innerHTML = ("Reply")
       document.querySelector('#email-view').appendChild(reply);
 
+      // Handling for when button clicked
       reply.onclick = function() {
         document.querySelector('#email-view').style.display = 'none';
         compose_email("Reply", email);
