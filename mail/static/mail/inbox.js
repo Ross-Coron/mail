@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-  // Load inbox by default
+  // Load inbox mailbox by default
   load_mailbox('inbox');
 
   // Event listeners for each NavBar button. Use buttons to toggle between views.
@@ -15,10 +15,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get email's unique id
     const email = event.target.dataset.email;
 
-    // Check if the user clicked view button or archive button
-    if (event.target.className === 'view') {
+    // Check if the user clicked view button and view that email
+    if (event.target.className === 'btn btn-sm btn-primary view') {
       view_email(email);
-    } else if (event.target.className === 'archive') {
+    }
+
+    // Check if the user clicked email archive button, archive, return to inbox view
+    else if (event.target.className === 'btn btn-sm btn-secondary archive') {
       archive_email(email);
     }
   });
@@ -49,6 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
     return false;
   };
 });
+
 
 // Function: displays compose email view (titled 'New Email' or 'Reply') and clears form contents
 function compose_email(state, email) {
@@ -97,6 +101,20 @@ function load_mailbox(mailbox) {
   // Inbox view
   if (mailbox === 'inbox') {
 
+
+    // YOU ARE HERE
+    var foo = document.querySelector('#emails-view')
+    var bar = document.createElement('div')
+    bar.classList.add('container')
+    foo.appendChild(bar)
+
+
+
+
+
+
+
+
     console.log('Debug: viewing inbox.');
 
     // GET request to API route 'emails/inbox', converts to JSON, provide array of emails as variable emails
@@ -132,7 +150,7 @@ function load_mailbox(mailbox) {
         }
       });
 
-    // Sent view
+  // Sent view
   } else if (mailbox === 'sent') {
 
     console.log('Debug: viewing sent emails');
@@ -142,16 +160,19 @@ function load_mailbox(mailbox) {
       .then(emails => {
         console.log(emails);
 
+
+
+
         for (let email in emails) {
           const item = document.createElement('div');
           item.id = 'style_test';
 
-          item.innerHTML = `Email from ${emails[email].sender} recieved ${emails[email].timestamp} <button class="view" data-email="${emails[email].id}">View</button>`;
+          item.innerHTML = `Email from ${emails[email].sender} recieved ${emails[email].timestamp} <button class="btn btn-sm btn-primary view" data-email="${emails[email].id}">View</button>`;
           document.querySelector('#emails-view').appendChild(item);
         }
       });
 
-    // Archive view
+  // Archive view
   } else if (mailbox === 'archive') {
 
     fetch('/emails/archive')
@@ -164,8 +185,8 @@ function load_mailbox(mailbox) {
           const item = document.createElement('div');
           item.id = "style_test";
 
-          item.innerHTML = `Email from ${emails[email].sender} recieved ${emails[email].timestamp} <button class="view" data-email="${emails[email].id}">View</button>`;
-          item.innerHTML += `<button class="archive" data-email="${emails[email].id}">Unarchive</button>`;
+          item.innerHTML = `Email from ${emails[email].sender} recieved ${emails[email].timestamp} <button class="btn btn-sm btn-primary view" data-email="${emails[email].id}">View</button>`;
+          item.innerHTML += `<button class="btn btn-sm btn-secondary archive" data-email="${emails[email].id}">Unarchive</button>`;
           document.querySelector('#emails-view').appendChild(item);
         }
       })
