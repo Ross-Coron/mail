@@ -15,17 +15,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get email's unique id
     const email = event.target.dataset.email;
 
-    // Find what was clicked on
-    // const element = event.target;
-
     // Check if the user clicked view button and view that email
     if (event.target.className === 'view') {
       view_email(email);
     }
-
-    //  if (event.target.className === 'compose') {
-    //    compose_email();
-    //  }
 
     // Check if the user clicked email archive button, archive, return to inbox view
     else if (event.target.className === 'archive') {
@@ -59,7 +52,6 @@ document.addEventListener('DOMContentLoaded', function() {
     return false;
   };
 });
-
 
 // Function: displays compose email view (titled 'New Email' or 'Reply') and clears form contents
 function compose_email(state, email) {
@@ -187,9 +179,6 @@ function view_email(email) {
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'none';
   document.querySelector('#email-view').style.display = 'block';
-
-  //console.log(event.target.dataset.email);
-  //  email = event.target.dataset.email
 
   // Mark email as read
   fetch(`/emails/${email}`, {
