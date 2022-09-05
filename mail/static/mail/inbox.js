@@ -16,12 +16,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const email = event.target.dataset.email;
 
     // Check if the user clicked view button and view that email
-    if (event.target.className === 'btn btn-sm btn-primary view') {
+    if (event.target.className === 'btn btn-sm btn-primary view float-right') {
       view_email(email);
     }
 
     // Check if the user clicked email archive button, archive, return to inbox view
-    else if (event.target.className === 'btn btn-sm btn-secondary archive') {
+    else if (event.target.className === 'btn btn-sm btn-secondary archive float-right') {
       archive_email(email);
     }
   });
@@ -102,18 +102,6 @@ function load_mailbox(mailbox) {
   if (mailbox === 'inbox') {
 
 
-    // YOU ARE HERE
-    var foo = document.querySelector('#emails-view')
-    var bar = document.createElement('div')
-    bar.classList.add('container')
-    foo.appendChild(bar)
-
-
-
-
-
-
-
 
     console.log('Debug: viewing inbox.');
 
@@ -124,34 +112,46 @@ function load_mailbox(mailbox) {
         // DEBUG - logs all emails as array to console
         console.log(emails);
 
+
+
         // For each email, create a list item with styling (style.css), and add
         for (let email in emails) {
+
           const item = document.createElement("div");
-          item.id = "style_test";
-          item.innerHTML = `Email from <b>${emails[email].sender}</b> recieved <b>${emails[email].timestamp}</b> <button class="btn btn-sm btn-primary view" data-email="${emails[email].id}">View</button>`;
+          item.className = "email";
+          item.innerHTML = `Email from <b>${emails[email].sender}</b> recieved <b>${emails[email].timestamp}</b>`
+
+          var viewButton = document.createElement("button");
+          viewButton.className = 'btn btn-sm btn-primary view float-right'
+          viewButton.dataset.email = emails[email].id
+          viewButton.innerHTML = "View"
+          item.appendChild(viewButton)
 
           // If email has been read, display as grey otherwise white
           if (emails[email].read === true) {
-            item.style.backgroundColor = "lightgray";
+            item.className += ' read';
           } else {
-            item.style.backgroundColor = "white";
+            item.className += ' unread';
           }
 
           // If email has NOT been archived, attach archive button
           if (emails[email].archived === false) {
-            item.innerHTML += `<button class="btn btn-sm btn-secondary archive" data-email="${emails[email].id}">Archive</button>`
-
-            // TODO
-            item.setAttribute("align", "center");
+            var archiveButton = document.createElement("button");
+            archiveButton.className = 'btn btn-sm btn-secondary archive float-right'
+            archiveButton.dataset.email = emails[email].id
+            archiveButton.innerHTML = "Archive"
+            item.appendChild(archiveButton)
           }
 
           // Add populated item to page
           document.querySelector('#emails-view').appendChild(item);
+
         }
-      });
+      })
+  }
 
   // Sent view
-  } else if (mailbox === 'sent') {
+  else if (mailbox === 'sent') {
 
     console.log('Debug: viewing sent emails');
 
@@ -159,8 +159,6 @@ function load_mailbox(mailbox) {
       .then(response => response.json())
       .then(emails => {
         console.log(emails);
-
-
 
 
         for (let email in emails) {
@@ -172,7 +170,7 @@ function load_mailbox(mailbox) {
         }
       });
 
-  // Archive view
+    // Archive view
   } else if (mailbox === 'archive') {
 
     fetch('/emails/archive')
