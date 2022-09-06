@@ -87,6 +87,7 @@ function compose_email(state, email) {
   }
 }
 
+
 // Function: view mailboxes. Called by clicking NavBar button. Three valid mailboxes / arguments: inbox, sent, and archive
 function load_mailbox(mailbox) {
 
@@ -100,9 +101,6 @@ function load_mailbox(mailbox) {
 
   // Inbox view
   if (mailbox === 'inbox') {
-
-
-
     console.log('Debug: viewing inbox.');
 
     // GET request to API route 'emails/inbox', converts to JSON, provide array of emails as variable emails
@@ -111,8 +109,6 @@ function load_mailbox(mailbox) {
       .then(emails => {
         // DEBUG - logs all emails as array to console
         console.log(emails);
-
-
 
         // For each email, create a list item with styling (style.css), and add
         for (let email in emails) {
@@ -160,12 +156,17 @@ function load_mailbox(mailbox) {
       .then(emails => {
         console.log(emails);
 
-
         for (let email in emails) {
-          const item = document.createElement('div');
-          item.id = 'style_test';
+          const item = document.createElement("div");
+          item.className = "email";
+          item.innerHTML = `Email to <b>${emails[email].recipients}</b> recieved <b>${emails[email].timestamp}</b>`
 
-          item.innerHTML = `Email from ${emails[email].sender} recieved ${emails[email].timestamp} <button class="btn btn-sm btn-primary view" data-email="${emails[email].id}">View</button>`;
+          var viewButton = document.createElement("button");
+          viewButton.className = 'btn btn-sm btn-primary view float-right'
+          viewButton.dataset.email = emails[email].id
+          viewButton.innerHTML = "View"
+          item.appendChild(viewButton)
+
           document.querySelector('#emails-view').appendChild(item);
         }
       });
@@ -176,16 +177,28 @@ function load_mailbox(mailbox) {
     fetch('/emails/archive')
       .then(response => response.json())
       .then(emails => {
-
         console.log(emails);
 
         for (let email in emails) {
-          const item = document.createElement('div');
-          item.id = "style_test";
+          var archiveItem = document.createElement("div");
+          archiveItem.className = "email";
+          archiveItem.innerHTML = `Email from <b>${emails[email].sender}</b> recieved <b>${emails[email].timestamp}</b>`
 
-          item.innerHTML = `Email from ${emails[email].sender} recieved ${emails[email].timestamp} <button class="btn btn-sm btn-primary view" data-email="${emails[email].id}">View</button>`;
-          item.innerHTML += `<button class="btn btn-sm btn-secondary archive" data-email="${emails[email].id}">Unarchive</button>`;
-          document.querySelector('#emails-view').appendChild(item);
+          var viewButton = document.createElement("button");
+          viewButton.className = 'btn btn-sm btn-primary view float-right'
+          viewButton.dataset.email = emails[email].id
+          viewButton.innerHTML = "View"
+          archiveItem.appendChild(viewButton)
+
+          if (emails[email].archived === true) {
+            var archiveButton = document.createElement("button");
+            archiveButton.className = 'btn btn-sm btn-secondary archive float-right'
+            archiveButton.dataset.email = emails[email].id
+            archiveButton.innerHTML = "Unarchive"
+            archiveItem.appendChild(archiveButton)
+          }
+
+          document.querySelector('#emails-view').appendChild(archiveItem);
         }
       })
   }
@@ -199,9 +212,6 @@ function view_email(email) {
   document.querySelector('#compose-view').style.display = 'none';
   document.querySelector('#email-view').style.display = 'block';
 
-  // Clear previous contents (if any)
-  document.getElementById("email-view").innerHTML = '';
-
   // Mark email as read
   fetch(`/emails/${email}`, {
     method: 'PUT',
@@ -214,22 +224,21 @@ function view_email(email) {
   fetch(`/emails/${email}`)
     .then(response => response.json())
     .then(email => {
-
       console.log(email);
 
-      // Display email fields as bullet points
-
-      for (let field in email) {
-        const email_field = document.createElement("li");
-
-        email_field.innerHTML = `${field}: ${email[field]}`;
-        document.querySelector('#email-view').appendChild(email_field);
-      }
+      var from = document.getElementById('from')
+      from.innerHTML = email.sender
+      var to = document.getElementById('to')
+      to.innerHTML = email.recipients
+      var subject = document.getElementById('subject')
+      subject.innerHTML = email.subject
+      var date = document.getElementById('date')
+      date.innerHTML = email.timestamp
+      var emailBody = document.getElementById('emailBody')
+      emailBody.innerHTML = email.body
 
       // Add reply button
-      const reply = document.createElement('button')
-      reply.innerHTML = ("Reply")
-      document.querySelector('#email-view').appendChild(reply);
+      reply = document.getElementById('replyButton');
 
       // Handling for when button clicked
       reply.onclick = function() {
