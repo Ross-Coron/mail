@@ -64,6 +64,7 @@ function compose_email(state, email) {
 
     // Show ('block') compose view and hide ('none') other views
     document.querySelector('#emails-view').style.display = 'none';
+    document.querySelector('#email-view').style.display = 'none';
     document.querySelector('#compose-view').style.display = 'block';
 
     // Clear out any previous values from form fields
@@ -115,7 +116,7 @@ function load_mailbox(mailbox) {
 
           const item = document.createElement("div");
           item.className = "email";
-          item.innerHTML = `Email from <b>${emails[email].sender}</b> recieved <b>${emails[email].timestamp}</b>`
+          item.innerHTML = `Email from <b>${emails[email].sender}</b> recieved <b>${emails[email].timestamp}</b>. Subject: <b>${emails[email].subject}</b>.`
 
           var viewButton = document.createElement("button");
           viewButton.className = 'btn btn-sm btn-primary view float-right'
@@ -159,7 +160,7 @@ function load_mailbox(mailbox) {
         for (let email in emails) {
           const item = document.createElement("div");
           item.className = "email";
-          item.innerHTML = `Email to <b>${emails[email].recipients}</b> recieved <b>${emails[email].timestamp}</b>`
+          item.innerHTML = `Email to <b>${emails[email].recipients}</b> sent <b>${emails[email].timestamp}</b>. Subject: <b>${emails[email].subject}</b>.`
 
           var viewButton = document.createElement("button");
           viewButton.className = 'btn btn-sm btn-primary view float-right'
