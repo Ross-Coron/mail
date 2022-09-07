@@ -111,6 +111,12 @@ function load_mailbox(mailbox) {
         // DEBUG - logs all emails as array to console
         console.log(emails);
 
+        if (emails.length === 0) {
+          const empty = document.createElement("div");
+          empty.innerHTML = "No emails to display..."
+          document.querySelector('#emails-view').appendChild(empty);
+        }
+
         // For each email, create a list item with styling (style.css), and add
         for (let email in emails) {
 
@@ -157,6 +163,12 @@ function load_mailbox(mailbox) {
       .then(emails => {
         console.log(emails);
 
+        if (emails.length === 0) {
+          const empty = document.createElement("div");
+          empty.innerHTML = "No emails to display..."
+          document.querySelector('#emails-view').appendChild(empty);
+        }
+
         for (let email in emails) {
           const item = document.createElement("div");
           item.className = "email";
@@ -179,6 +191,12 @@ function load_mailbox(mailbox) {
       .then(response => response.json())
       .then(emails => {
         console.log(emails);
+
+        if (emails.length === 0) {
+          const empty = document.createElement("div");
+          empty.innerHTML = "No emails to display..."
+          document.querySelector('#emails-view').appendChild(empty);
+        }
 
         for (let email in emails) {
           var archiveItem = document.createElement("div");
