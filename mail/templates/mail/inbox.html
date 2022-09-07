@@ -2,7 +2,8 @@
 {% load static %}
 
 {% block body %}
-<!-- Logged in user's email address -->
+
+<!-- Bootstrap grid displaying user's email address, navigation buttons, and logo -->
 <div class="container">
   <div class="row">
     <div class="col">
@@ -16,25 +17,22 @@
       <a class="btn btn-sm btn-outline-primary" href="{% url 'logout' %}">Log Out</a>
       <div class="row">
       </div>
-
     </div>
     <div class="col text-right">
+      <!-- Custom logo. Adapted from: https://www.stockio.com/free-icon/stationery-envelope -->
       <img src="/static/mail_logo.png" style="width:75px" class="mt-3">
     </div>
   </div>
 </div>
 <hr>
 
-<!-- Div element 1 - shows contents of email inbox -->
+<!-- Div element 1: shows contents of email inbox -->
 <div id="emails-view">
 
 </div>
 
-<!-- Div element 2 - shows contents of an email -->
+<!-- Div element 2: shows contents of single email. Bootstrap grid. Values plugged into via JS. -->
 <div id="email-view">
-
-
-
   <div class="container ">
     <div class="row bg-light border border-primary mt-3 ">
       <div class="col-2 font-weight-bold">
@@ -55,7 +53,7 @@
   </div>
 </div>
 
-<!-- Div element 3 - shows compose email form -->
+<!-- Div element 3: shows compose email form -->
 <div id="compose-view">
   <h3 id="NewOrReply"></h3>
   <form id="compose-form">

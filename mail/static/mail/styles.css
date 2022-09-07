@@ -1,8 +1,8 @@
 textarea {
-    min-height: 400px;
+  min-height: 400px;
 }
 
-/* Test style for emails fields  */
+/* Single email styling  */
 .email {
   line-height: 30px;
   padding: 10px;
