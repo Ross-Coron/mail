@@ -64,12 +64,12 @@ function compose_email(state, email) {
   document.querySelector('#email-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
 
-  if (state === "Reply") {
+  // Clear out any previous values from form fields
+  document.querySelector('#compose-recipients').value = '';
+  document.querySelector('#compose-subject').value = '';
+  document.querySelector('#compose-body').value = '';
 
-    // Clear out any previous values from form fields
-    document.querySelector('#compose-recipients').value = '';
-    document.querySelector('#compose-subject').value = '';
-    document.querySelector('#compose-body').value = '';
+  if (state === "Reply") {
 
     // Auto fill form with reply elements (Re., sender, etc.)
     document.querySelector('#compose-recipients').value = `${email.sender}`;
